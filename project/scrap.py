@@ -8,17 +8,17 @@ window_width, window_height = 800, 600
 particles = []
 
 def initialize_particles():
-    bottle_radius = 0.5
-    bottle_height = 1.5
+    bottle_radius = 0.125
+    bottle_height = 0.7
     return [{'x': random.uniform(-bottle_radius, bottle_radius),
-             'y': random.uniform(-bottle_height / 2, bottle_height / 2),
+             'y': random.uniform(-bottle_height / 4, bottle_height / 4),
              'z': random.uniform(-bottle_radius, bottle_radius),
-             'dx': 0, 'dy': -0.01, 'dz': 0} for _ in range(10000)]
+             'dx': 0, 'dy': -0.0, 'dz': 0} for _ in range(2000)]
 def update_particles():
     global particles
     damping = 0.98  # Damping factor to simulate fluid viscosity
-    bottle_radius = 0.5
-    bottle_height = 1.5
+    bottle_radius = 0.09
+    bottle_height = 0.7
     for particle in particles:
         # Apply gravity and damping
         particle['dy'] += -0.001
@@ -39,8 +39,10 @@ def update_particles():
             reflection = velocity - 2 * np.dot(velocity, normal) * normal
             particle['dx'], particle['dz'] = reflection[0], reflection[2]
         if particle['y'] < -bottle_height / 2:
-            particle['y'] = -bottle_height / 2
-            particle['dy'] *= -0.5
+            particle['y'] = -bottle_height / 4
+            particle['dy'] += 0.0145
+            particle['y'] = bottle_height/ 1000
+            particle['dx'] += 0.00000001
 
 
 def mouse_button_callback(window, button, action, mods):
@@ -49,6 +51,7 @@ def mouse_button_callback(window, button, action, mods):
         increase_pressure_near(x, y)
 
 def increase_pressure_near(x, y):
+    
     # Convert screen coordinates to OpenGL coordinates
     opengl_x = (x / window_width) * 2 - 1
     opengl_y = 1 - (y / window_height) * 2
@@ -73,8 +76,10 @@ def increase_pressure_near(x, y):
 
 def render_particles():
     global particles
-    glColor3f(0.0, 0.0, 1.0)
+    glColor3f(0.0, 0.0, 1.0)    
+    glPointSize(3.0)  # Set the point size to 10 pixels
     glBegin(GL_POINTS)
+
     for particle in particles:
         glVertex3f(particle['x'], particle['y'], particle['z'])
     glEnd()
